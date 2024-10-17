@@ -1,9 +1,15 @@
-import { UserButton } from "@clerk/nextjs";
-
-export default function Home() {
+// this is a server component-> looks impossible as its a form ..
+import React from "react";
+import Question from "@/components/forms/Question";
+const Page = () => {
   return (
     <div>
-      <UserButton />
+      <h1 className="h1-bold text-dark100_light900">Ask a Question</h1>
+      <div className="mt-9">
+        <Question />
+      </div>
     </div>
   );
-}
+};
+
+export default Page;
