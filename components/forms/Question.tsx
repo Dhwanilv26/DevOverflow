@@ -22,10 +22,8 @@ import { Input } from "@/components/ui/input";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
-
 import { QuestionsSchema } from "@/lib/validations";
-
-import { useRef, useState } from "react";
+import React, { useRef, useState } from "react";
 import { Editor } from "@tinymce/tinymce-react";
 import { Badge } from "../ui/badge";
 import Image from "next/image";
@@ -50,7 +48,7 @@ const Question = () => {
   });
 
   // 2. Define a submit handler.
-  async  function onSubmit(values: z.infer<typeof QuestionsSchema>) {
+  async function onSubmit(values: z.infer<typeof QuestionsSchema>) {
     setIsSubmitting(true);
 
     try {
@@ -58,7 +56,7 @@ const Question = () => {
       // contain all form data
       // navigate to home page
 
-      await createQuestion({})
+      await createQuestion({});
     } catch (error) {
     } finally {
       setIsSubmitting(false);
@@ -148,9 +146,8 @@ const Question = () => {
                   }}
                   onBlur={field.onBlur}
                   onEditorChange={(content) => {
-                   
-                    // form.setValue("explaination", content);
-                    field.onChange(content); 
+                    form.setValue("explaination", content);
+                    field.onChange(content);
                   }}
                   initialValue=""
                   init={{
