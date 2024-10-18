@@ -2,6 +2,11 @@
 // renders a form for the user to ask a question
 // zod -> typescript form validator types of data ->consistent
 
+// client and server different nahi hai next js mai
+// client is the full stack app here
+// no need to create new api endpoints like in react (thanks to next server actions)
+
+// functions can be called from the client only
 import { Button } from "@/components/ui/button";
 import {
   Form,
@@ -25,6 +30,7 @@ import { Editor } from "@tinymce/tinymce-react";
 import { Badge } from "../ui/badge";
 import Image from "next/image";
 import { useTheme } from "@/context/ThemeProvider";
+import { createQuestion } from "@/lib/actions/question.action";
 
 const type = "create";
 
@@ -44,13 +50,15 @@ const Question = () => {
   });
 
   // 2. Define a submit handler.
-  function onSubmit(values: z.infer<typeof QuestionsSchema>) {
+  async  function onSubmit(values: z.infer<typeof QuestionsSchema>) {
     setIsSubmitting(true);
 
     try {
       // make an async call to your api-> create a question
       // contain all form data
       // navigate to home page
+
+      await createQuestion({})
     } catch (error) {
     } finally {
       setIsSubmitting(false);
@@ -137,6 +145,12 @@ const Question = () => {
                   onInit={(_evt, editor) => {
                     // @ts-ignore
                     editorRef.current = editor;
+                  }}
+                  onBlur={field.onBlur}
+                  onEditorChange={(content) => {
+                   
+                    // form.setValue("explaination", content);
+                    field.onChange(content); 
                   }}
                   initialValue=""
                   init={{
