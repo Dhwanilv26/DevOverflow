@@ -11,7 +11,7 @@ export async function POST(req: Request) {
 
   // TODO : ADD WEBHOOK TO SECRET TO .ENV.LOCAL
 
-  const WEBHOOK_SECRET = process.env.WEBHOOK_SECRET;
+  const WEBHOOK_SECRET = process.env.NEXT_CLERK_WEBHOOK_SECRET;
 
   if (!WEBHOOK_SECRET) {
     throw new Error(
@@ -58,6 +58,8 @@ export async function POST(req: Request) {
   // Do something with the payload
   // For this guide, you simply log the payload to the console
   const eventType = evt.type;
+
+  console.log(eventType);
 
   if (eventType === "user.created") {
     const { id, email_addresses, image_url, username, first_name, last_name } =
