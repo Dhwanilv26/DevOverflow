@@ -1,7 +1,6 @@
 // this is a server component-> looks impossible as its a form ..
 import React from "react";
 import Question from "@/components/forms/Question";
-import { auth } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import { getUserById } from "@/lib/actions/user.action";
 const Page = async () => {
