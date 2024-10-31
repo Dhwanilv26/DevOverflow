@@ -36,13 +36,15 @@ export const getTimeStamp = (createdAt: Date): string => {
   return `${secondsAgo} second${secondsAgo > 1 ? "s" : ""} ago`;
 };
 
-export const formatLargeNumber = (num: number): string => {
-  if (num >= 1_000_000_000) {
-    return `${(num / 1_000_000_000).toFixed(1)}B`; // Billions
-  } else if (num >= 1_000_000) {
-    return `${(num / 1_000_000).toFixed(1)}M`; // Millions
-  } else if (num >= 1_000) {
-    return `${(num / 1_000).toFixed(1)}K`; // Thousands
+export const formatLargeNumber = (num: number | null | undefined): string => {
+  const safeNum = num ?? 0; // Default to 0 if num is null or undefined
+
+  if (safeNum >= 1000000) {
+    return `${(safeNum / 1000000).toFixed(1)}M`;
+  } else if (safeNum >= 1000) {
+    return `${(safeNum / 1000).toFixed(1)}K`;
+  } else {
+    return safeNum.toString();
   }
-  return num.toString(); // For numbers less than a thousand
 };
+
