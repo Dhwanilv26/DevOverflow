@@ -5,7 +5,7 @@ import Question from "@/components/forms/Question";
 import { redirect } from "next/navigation";
 import { getUserById } from "@/lib/actions/user.action";
 const Page = async () => {
-  const userId = "clerk123456";
+  const userId = '64d8f9beeb15d19a4b4a103b';
 
   // console.log("clerk Id", userId);
 

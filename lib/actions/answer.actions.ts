@@ -2,13 +2,18 @@
 
 import Answer from '@/database/answer.model';
 import { connectToDatabase } from '../mongoose';
-import { AnswerVoteParams, CreateAnswerParams, GetAnswersParams } from './shared.types';
+import {
+  AnswerVoteParams,
+  CreateAnswerParams,
+  GetAnswersParams,
+} from './shared.types';
 import Question from '@/database/question.model';
 import { revalidatePath } from 'next/cache';
 import mongoose from 'mongoose';
+
 export async function createAnswer(params: CreateAnswerParams) {
   try {
-    connectToDatabase();
+    await connectToDatabase(); // Use await to ensure DB connection before proceeding
     const { content, author, question, path } = params;
     const newAnswer = await Answer.create({
       content,
@@ -20,7 +25,6 @@ export async function createAnswer(params: CreateAnswerParams) {
     await Question.findByIdAndUpdate(question, {
       $push: { answers: newAnswer._id },
     });
-    // TODO: ADD INTERACTION..
 
     revalidatePath(path);
   } catch (error) {
@@ -31,7 +35,7 @@ export async function createAnswer(params: CreateAnswerParams) {
 
 export async function getAnswers(params: GetAnswersParams) {
   try {
-    connectToDatabase();
+    await connectToDatabase();
     const { questionId } = params;
 
     const answers = await Answer.find({ question: questionId })
@@ -45,81 +49,84 @@ export async function getAnswers(params: GetAnswersParams) {
   }
 }
 
-
 export async function upvoteAnswer(params: AnswerVoteParams) {
   try {
-    connectToDatabase();
+    await connectToDatabase();
 
     const { answerId, userId, hasupVoted, hasdownVoted, path } = params;
-    
+
+    // Convert userId to a mongoose ObjectId
+    const userObjectId = new mongoose.Types.ObjectId(userId); // Use ObjectId for MongoDB compatibility
 
     let updateQuery = {};
     // just toggling b/w upvotes and downvotes in the database
     if (hasupVoted) {
-      updateQuery = { $pull: { upvotes: userId } };
+      updateQuery = { $pull: { upvotes: userObjectId } }; // Updated to use userObjectId
     } else if (hasdownVoted) {
       updateQuery = {
-        $pull: { downvotes: userId },
-        $push: { upvotes: userId },
+        $pull: { downvotes: userObjectId },
+        $push: { upvotes: userObjectId },
       };
     } else {
-      updateQuery = { $addToSet: { upvotes: userId } };
+      updateQuery = { $addToSet: { upvotes: userObjectId } }; // Updated to use userObjectId
     }
 
     const answer = await Answer.findByIdAndUpdate(answerId, updateQuery, {
       new: true,
     });
 
-    return answer;
-
     if (!answer) {
-      throw new Error('answer not found');
+      throw new Error('Answer not found');
     }
 
-    // increment author's reputation by +10
+    console.log(answer);
 
-    revalidatePath(path);
+    // Increment author's reputation by +10 if needed here
+    revalidatePath(path); 
+
+    return answer;
   } catch (error) {
     console.log(error);
     throw error;
   }
 }
 
-
 export async function downvoteAnswer(params: AnswerVoteParams) {
   try {
-    connectToDatabase();
+    await connectToDatabase();
 
     const { answerId, userId, hasupVoted, hasdownVoted, path } = params;
+
+    // Convert userId to a mongoose ObjectId
+    const userObjectId = new mongoose.Types.ObjectId(userId); // Use ObjectId for MongoDB compatibility
 
     let updateQuery = {};
 
     if (hasdownVoted) {
-      updateQuery = { $pull: { downvotes: userId } };
+      updateQuery = { $pull: { downvotes: userObjectId } }; // Updated to use userObjectId
     } else if (hasupVoted) {
       updateQuery = {
-        $pull: { upvotes: userId },
-        $push: { downvotes: userId },
+        $pull: { upvotes: userObjectId },
+        $push: { downvotes: userObjectId },
       };
     } else {
-      updateQuery = { $addToSet: { downvotes: userId } };
+      updateQuery = { $addToSet: { downvotes: userObjectId } }; // Updated to use userObjectId
     }
 
-    const answer = await Question.findByIdAndUpdate(answerId, updateQuery, {
+    const answer = await Answer.findByIdAndUpdate(answerId, updateQuery, {
       new: true,
     });
 
     if (!answer) {
-      throw new Error('answer not found');
+      throw new Error('Answer not found');
     }
 
-    return answer;
-    
+    // Increment author's reputation by -10 if needed here
+    revalidatePath(path);  
 
-    revalidatePath(path);
+    return answer;
   } catch (error) {
     console.log(error);
     throw error;
   }
 }
-

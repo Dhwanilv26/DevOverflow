@@ -116,8 +116,10 @@ export async function upvoteQuestion(params:QuestionVoteParams){
       updateQuery={$pull :{upvotes:userId}}
     }
     else if (hasdownVoted){
-      updateQuery={$pull:{downvotes:userId}
-    ,$push:{upvotes:userId}}
+      updateQuery = {
+        $pull: { downvotes: userId },
+        $push: { upvotes: userId }
+      }
       
     }
     else{
