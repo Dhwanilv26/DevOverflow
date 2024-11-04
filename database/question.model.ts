@@ -15,7 +15,7 @@ export interface IQuestion extends Document {
 const QuestionsSchema = new Schema({
   title: { type: String, required: true },
   content: { type: String, required: true },
-  tags: [{ type: Schema.Types.ObjectId, ref: "tag" }],
+  tags: [{ type: Schema.Types.ObjectId, ref: "Tag" }],
   views: { type: Number, default: 0 },
   upvotes: [{ type: Schema.Types.ObjectId, ref: "User" }],
   downvotes: [{ type: Schema.Types.ObjectId, ref: "User" }],

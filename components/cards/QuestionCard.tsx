@@ -1,8 +1,8 @@
-import Link from "next/link";
-import React from "react";
-import RenderTag from "../shared/RenderTag";
-import Metric from "../shared/Metric";
-import { formatLargeNumber, getTimeStamp } from "@/lib/utils";
+import Link from 'next/link';
+import React from 'react';
+import RenderTag from '../shared/RenderTag';
+import Metric from '../shared/Metric';
+import { formatLargeNumber, getTimeStamp } from '@/lib/utils';
 
 interface QuestionProps {
   _id: string;
@@ -21,8 +21,10 @@ interface QuestionProps {
   views: number;
   answers: Array<object>;
   createdAt: Date;
+  clerkId?: string | null;
 }
 const QuestionCard = ({
+  clerkId,
   _id,
   title,
   tags,
@@ -47,7 +49,7 @@ const QuestionCard = ({
         </div>
 
         {/* if signed in add edit delete actions */}
-        {/* line clamp -> keeps everything in 1 line and hides on overflow */}
+        
       </div>
 
       <div className="gap mt-3.5 flex flex-wrap gap-2">
