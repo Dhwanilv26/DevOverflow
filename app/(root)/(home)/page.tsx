@@ -1,18 +1,22 @@
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
-import LocalSearchBar from "@/components/shared/search/LocalSearchBar";
-import Filter from "@/components/shared/Filter";
-import { HomePageFilters } from "@/constants/filters";
-import HomeFilters from "@/components/home/HomeFilters";
-import NoResult from "@/components/shared/NoResult";
-import QuestionCard from "@/components/cards/QuestionCard";
-import { getQuestions } from "@/lib/actions/question.action";
-import { SearchParamsProps } from "@/types";
-export default async function Home({ searchParams }:SearchParamsProps) {
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
+import LocalSearchBar from '@/components/shared/search/LocalSearchBar';
+import Filter from '@/components/shared/Filter';
+import { HomePageFilters } from '@/constants/filters';
+import HomeFilters from '@/components/home/HomeFilters';
+import NoResult from '@/components/shared/NoResult';
+import QuestionCard from '@/components/cards/QuestionCard';
+import { getQuestions } from '@/lib/actions/question.action';
+import { SearchParamsProps } from '@/types';
+import Pagination from '@/components/shared/Pagination';
+export default async function Home({ searchParams }: SearchParamsProps) {
   const result = await getQuestions({
     searchQuery: searchParams.q,
-    filter:searchParams.filter
+    filter: searchParams.filter,
+    page: searchParams.page ? +searchParams.page : 1,
   });
+
+
   return (
     <>
       <div className="flex w-full flex-col-reverse justify-between gap-4 sm:flex-row sm:items-center">
@@ -67,6 +71,12 @@ export default async function Home({ searchParams }:SearchParamsProps) {
             linkTitle="Ask a Question"
           />
         )}
+      </div>
+      <div className="mt-10">
+        <Pagination
+          pageNumber={searchParams?.page ? +searchParams.page : 1}
+          isNext={result.isNext}
+        />
       </div>
     </>
   );

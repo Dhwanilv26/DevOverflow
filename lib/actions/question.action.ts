@@ -19,7 +19,9 @@ export async function getQuestions(params: GetQuestionsParams) {
   try {
     await connectToDatabase();
 
-    const { searchQuery, filter } = params;
+    const { searchQuery, filter, page = 1, pageSize = 4 } = params;
+
+    const skipAmount = (page - 1) * pageSize;
 
     const query: FilterQuery<typeof Question> = {};
 
@@ -55,13 +57,21 @@ export async function getQuestions(params: GetQuestionsParams) {
     const questions = await Question.find(query)
       .populate({ path: 'tags', model: Tag })
       .populate({ path: 'author', model: User })
+      .skip(skipAmount)
+      .limit(pageSize)
       .sort(sortOptions);
-    // -1 used for sorting in descending order
+
+    const totalQuestions = await Question.countDocuments(query);
+
+    const isNext = totalQuestions > skipAmount + questions.length;
+
+    // questions.length -> questions to be shown in the current page
+    // skipamount is the questions skipped untill now (depends on pageSize)
 
     // mongodb stores only the references or the ids by default
     // so inorder to get the actual data we have to populate it
 
-    return { questions };
+    return { questions, isNext };
   } catch (error) {
     console.log(error);
     throw error;
