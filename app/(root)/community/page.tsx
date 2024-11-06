@@ -9,7 +9,9 @@ import dynamic from "next/dynamic";
 const Page = async ({ searchParams }: SearchParamsProps) => {
   
   const result = await getAllUsers({
-    searchQuery:searchParams.q
+    searchQuery: searchParams.q,
+    filter:searchParams.filter
+    
   });
   const UserCard = dynamic(() => import('@/components/cards/UserCard'), {
     ssr: false,
