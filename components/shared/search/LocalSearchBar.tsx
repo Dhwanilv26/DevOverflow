@@ -29,30 +29,33 @@ const LocalSearchBar = ({
   // use debouncing instead
 
   useEffect(() => {
-    const delayDebounceFn = setTimeout(() => {}, 300);
-    // if other params due to filtering are present
-    if (search) {
-      const newUrl = formUrlQuery({
-        params: searchParams.toString(),
-        key: 'q',
-        value: search
-      });
-
-      router.push(newUrl, { scroll: false });
-    }
-
-    else {
-      if (pathname === route) {
-        const newUrl = removeKeysFromQuery({
+    const delayDebounceFn = setTimeout(() => {
+      if (search) {
+        const newUrl = formUrlQuery({
           params: searchParams.toString(),
-          keysToRemove:['q']
-        })
+          key: 'q',
+          value: search,
+        });
+
         router.push(newUrl, { scroll: false });
+      } else {
+        console.log(route, pathname);
+        if (pathname === route) {
+          const newUrl = removeKeysFromQuery({
+            params: searchParams.toString(),
+            keysToRemove: ['q'],
+          });
+
+          router.push(newUrl, { scroll: false });
+        }
       }
-    }
+    }, 300);
 
     return () => clearTimeout(delayDebounceFn);
-  }, [search, pathname,route, router, searchParams, query]);
+  }, [search, route, pathname, router, searchParams, query]);
+
+
+  
   return (
     <div
       className={`background-light800_darkgradient flex min-h-[56px] grow items-center gap-4 rounded-[10px] px-4 ${otherClasses}`}
