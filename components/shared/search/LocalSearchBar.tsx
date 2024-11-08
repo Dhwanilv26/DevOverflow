@@ -63,7 +63,7 @@ const LocalSearchBar = ({
       {iconPosition === 'left' && (
         <Image
           src={imgSrc}
-          width={24}
+          width={24}  
           height={24}
           className="cursor-pointer"
           alt=""

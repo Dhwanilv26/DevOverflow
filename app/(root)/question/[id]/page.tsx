@@ -30,8 +30,6 @@ const Page = async ({ params, searchParams
 
 const result = await getQuestionById({ questionId: params.id });
 
- 
-
   return (
     <>
       <div className="flex-start w-full flex-col">
@@ -118,7 +116,6 @@ const result = await getQuestionById({ questionId: params.id });
       question={result.content}
       questionId={JSON.stringify(result._id)}
       authorId={JSON.stringify(mongoUser._id)}
-        
       />
 
 
