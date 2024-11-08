@@ -2,9 +2,7 @@ import { getUserInfo } from '@/lib/actions/user.action';
 import { URLProps } from '@/types';
 import React from 'react';
 import Image from 'next/image';
-import { SignedIn } from '@clerk/clerk-react';
 import Link from 'next/link';
-import { auth } from '@clerk/nextjs/server';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { getJoinedDate } from '@/lib/utils';
@@ -76,8 +74,10 @@ const Page = async ({ params, searchParams }: URLProps) => {
         </div>
       </div>
       <Stats
+        reputation={userInfo.reputation}
         totalQuestions={userInfo.totalQuestions}
         totalAnswers={userInfo.totalAnswers}
+        badges={userInfo.badgeCounts}
       />
       <div className="mt-10 flex gap-10">
         <Tabs defaultValue="top-posts" className="flex-1">

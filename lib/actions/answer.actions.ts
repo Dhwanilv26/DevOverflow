@@ -12,7 +12,7 @@ import Question from '@/database/question.model';
 import { revalidatePath } from 'next/cache';
 import mongoose from 'mongoose';
 import Interaction from './interaction.model';
-
+import User from '@/database/user.model';
 export async function createAnswer(params: CreateAnswerParams) {
   try {
     await connectToDatabase(); // Use await to ensure DB connection before proceeding
@@ -24,8 +24,20 @@ export async function createAnswer(params: CreateAnswerParams) {
     });
 
     // add the answer to the question's answers array
-    await Question.findByIdAndUpdate(question, {
+    const questionObject = await Question.findByIdAndUpdate(question, {
       $push: { answers: newAnswer._id },
+    });
+
+    await Interaction.create({
+      user: author,
+      action: 'answer',
+      question,
+      answer: newAnswer._id,
+      tags: questionObject.tags,
+    });
+
+    await User.findByIdAndUpdate(author, {
+      $inc: { reputation: 10 },
     });
 
     revalidatePath(path);
@@ -39,23 +51,22 @@ export async function getAnswers(params: GetAnswersParams) {
   try {
     await connectToDatabase();
     const { questionId, sortBy, page = 1, pageSize = 10 } = params;
-    
+
     const skipAmount = (page - 1) * pageSize;
-    
+
     let sortOptions = {};
 
     switch (sortBy) {
-      
-      case "highestUpvotes":
+      case 'highestUpvotes':
         sortOptions = { upvotes: -1 };
         break;
-      case "lowestUpvotes":
+      case 'lowestUpvotes':
         sortOptions = { upvotes: 1 };
         break;
-      case "recent":
+      case 'recent':
         sortOptions = { createdAt: -1 };
         break;
-      case "old":
+      case 'old':
         sortOptions = { createdAt: 1 };
         break;
     }
@@ -65,12 +76,12 @@ export async function getAnswers(params: GetAnswersParams) {
       .sort(sortOptions)
       .skip(skipAmount)
       .limit(pageSize);
-    
-    const totalAnswers = await Answer.countDocuments({ question: questionId })
-    
+
+    const totalAnswers = await Answer.countDocuments({ question: questionId });
+
     const isNextAnswers = totalAnswers > skipAmount + answers.length;
 
-    return { answers ,isNextAnswers};
+    return { answers, isNextAnswers };
   } catch (error) {
     console.log(error);
     throw error;
@@ -109,7 +120,13 @@ export async function upvoteAnswer(params: AnswerVoteParams) {
 
     console.log(answer);
 
-    // Increment author's reputation by +10 if needed here
+    await User.findByIdAndUpdate(userId, {
+      $inc: { reputation: hasupVoted ? -2 : 2 },
+    });
+
+    await User.findByIdAndUpdate(answer.author, {
+      $inc: { reputation: hasupVoted ? -10 : 10 },
+    });
     revalidatePath(path);
 
     return answer;
@@ -150,6 +167,14 @@ export async function downvoteAnswer(params: AnswerVoteParams) {
     }
 
     // Increment author's reputation by -10 if needed here
+
+     await User.findByIdAndUpdate(userId, {
+       $inc: { reputation: hasdownVoted ? -2 : 2 },
+     });
+
+     await User.findByIdAndUpdate(answer.author, {
+       $inc: { reputation: hasdownVoted ? -10 : 10 },
+     });
     revalidatePath(path);
 
     return answer;
